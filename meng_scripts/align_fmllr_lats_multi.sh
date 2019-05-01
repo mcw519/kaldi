@@ -1,11 +1,13 @@
 #!/bin/bash
 #
 # Copyright 2012-2015  Johns Hopkins University (Author: Daniel Povey)
+# Copyright 2019  Author: Meng Wu
 # Apache 2.0
 
 # Version of align_fmllr.sh that generates lattices (lat.*.gz) with
 # alignments of alternative pronunciations in them.  Mainly intended
 # as a precursor to CTC training for now.
+# New version support each utterance with different word segment.
 
 # Begin configuration section.
 stage=0
@@ -16,7 +18,7 @@ scale_opts="--transition-scale=1.0 --self-loop-scale=0.1"
 acoustic_scale=0.1
 max_active=7000
 lattice_beam=6.0
-laten_beam=2000
+laten_beam=2000 # still need to tune
 beam=10
 retry_beam=40
 final_beam=20  # For the lattice-generation phase there is no retry-beam.  This
@@ -35,8 +37,9 @@ echo "$0 $@"  # Print the command line for logging
 . parse_options.sh || exit 1;
 
 if [ $# != 4 ]; then
-   echo "usage: steps/align_fmllr_lats.sh <data-dir> <lang-dir> <src-dir> <align-dir>"
-   echo "e.g.:  steps/align_fmllr_lats.sh data/train data/lang exp/tri1 exp/tri1_lats"
+   echo "usage: $0 <data-dir> <lang-dir> <src-dir> <align-dir>"
+   echo "e.g.:  $0 data/train data/lang exp/tri1 exp/tri1_lats"
+   echo "First thing check data dir contain how much different and set up split data dir"
    echo "main options (for others, see top of script file)"
    echo "  --config <config-file>                           # config containing options"
    echo "  --nj <nj>                                        # number of parallel jobs"
@@ -56,8 +59,34 @@ sdata=$data/split${nj}_1 # carefully used split_1 to be the based split data dir
 
 mkdir -p $dir/log
 echo $nj > $dir/num_jobs
+
+## text file check and setup split data dir
+
 #[[ -d $sdata && $data/feats.scp -ot $sdata ]] || split_data.sh $data $nj || exit 1;
-if [ -x $sdata ]; then echo "${0}: check file is OK" ; else echo "$0 :$data do not contain split${nj}_1 and split${nj}_1" dir; exit 1; fi 
+#if [ -x $sdata ]; then echo "${0}: check file is OK" ; else echo "$0 :$data do not contain split${nj}_1 and split${nj}_1" dir; exit 1; fi 
+rm -rf $data/text # remove old text link
+#rm -rf $data/split*
+num_text_file=`ls $data | grep text | wc -l`
+echo $num_text_file
+if [ $num_text_file -eq 1 ]; then
+	echo "$0: please use align_fmllr_lats.sh"
+	exit 1;
+   else
+	echo "$0: you use $num_text_file types word segment to compile training graph"
+fi
+
+echo "$0: create each segment split data dir"
+if [ -d $sdata ]; then
+   	echo "$0: already contain split data dir, skip this step"
+   else
+	for x in $(seq 1 $num_text_file); do
+   	   echo "$0: split text $x"
+   	   ln -s $PWD/$data/text_$x $data/text
+	   utils/split_data.sh $data $nj 
+	   mv $data/split$nj $data/split${nj}_$x
+	   rm $data/text
+	done
+fi
 
 utils/lang/check_phones_compatible.sh $lang/phones.txt $srcdir/phones.txt || exit 1;
 cp $lang/phones.txt $dir || exit 1;
@@ -103,15 +132,16 @@ if [ $stage -le 0 ]; then
   echo "$0: compiling training graphs"
   mkdir -p $data/text_temp
   $cmd JOB=1:$nj $data/text_temp/log/merge_text.JOB.log \
-    cat $data/split${nj}_1/JOB/text $data/split${nj}_2/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
+     cat $data/split${nj}_*/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
   tra="ark:utils/sym2int.pl --map-oov $oov -f 2- $lang/words.txt $data/text_temp/text.JOB|";
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log  \
     compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $scale_opts $dir/tree $dir/final.mdl  $lang/L.fst "$tra" \
     "ark:|gzip -c >$dir/fsts.JOB.gz" || exit 1;
-	echo "$0: union different text source fsts in one training graph"
+     echo "$0: union different text source fsts in one training graph"
   $cmd JOB=1:$nj $dir/log/union_fst.JOB.log \
     fsts-union "ark:gunzip -c $dir/fsts.JOB.gz|" "ark:|gzip -c >$dir/union.JOB.gz" || exit 1;
   rm $dir/fsts.*.gz # save space
+  rm -r $data/text_temp
 fi
 
 
