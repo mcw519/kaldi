@@ -1,11 +1,12 @@
 #!/bin/bash
 # Copyright 2012  Johns Hopkins University (Author: Daniel Povey)
-# Apache 2.0
 # Copyright 2019 Meng Wu
+# Apache 2.0
 
 # To be run from ..
 # Flat start and monophone training, with delta-delta features.
 # This script applies cepstral mean normalization (per speaker).
+# New version support each utterance with different word segment.
 
 # Begin configuration section.
 nj=4
@@ -31,8 +32,9 @@ if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
 
 if [ $# != 3 ]; then
-  echo "Usage: steps/train_mono.sh [options] <data-dir> <lang-dir> <exp-dir>"
-  echo " e.g.: steps/train_mono.sh data/train.1k data/lang exp/mono"
+  echo "Usage: $0 [options] <data-dir> <lang-dir> <exp-dir>"
+  echo " e.g.: $0 data/train.1k data/lang exp/mono"
+  echo "First thing check data dir contain how much different and set up split data dir"
   echo "main options (for others, see top of script file)"
   echo "  --config <config-file>                           # config containing options"
   echo "  --nj <nj>                                        # number of parallel jobs"
@@ -48,9 +50,30 @@ oov=`cat $lang/oov.int` || exit 1;
 
 mkdir -p $dir/log
 echo $nj > $dir/num_jobs
-sdata=$data/split${nj}_1;
-#[[ -d $sdata && $data/feats.scp -ot $sdata ]] || split_data.sh $data $nj || exit 1;
-if [ -x $sdata ]; then echo "${0}: check file is OK" ; else echo "$data do not contain split${nj}_1 and split${nj}_1" dir || exit 1; fi
+sdata=$data/split${nj}_1; # carefully used split_1 to be the based split data dir.
+
+rm -rf $data/text # remove old text link
+num_text_file=`ls $data | grep text | wc -l`
+echo $num_text_file
+if [ $num_text_file -eq 1 ]; then
+	echo "$0: please use align_fmllr_lats.sh"
+	exit 1;
+   else
+	echo "$0: you use $num_text_file types word segment to compile training graph"
+fi
+
+echo "$0: create each segment split data dir"
+if [ -d $sdata ]; then
+   	echo "$0: already contain split data dir, skip this step"
+   else
+	for x in $(seq 1 $num_text_file); do
+   	   echo "$0: split text $x"
+   	   ln -s $PWD/$data/text_$x $data/text
+	   utils/split_data.sh $data $nj 
+	   mv $data/split$nj $data/split${nj}_$x
+	   rm $data/text
+	done
+fi
 
 cp $lang/phones.txt $dir || exit 1;
 
@@ -85,11 +108,12 @@ if [ $stage -le -2 ]; then
   echo "$0: Compiling training graphs"
   mkdir -p $data/text_temp
   $cmd JOB=1:$nj $data/text_temp/log/merge_text.JOB.log \
-    cat $data/split${nj}_1/JOB/text $data/split${nj}_2/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
+    cat $data/split${nj}_*/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
   tra="ark:utils/sym2int.pl --map-oov $oov -f 2- $lang/words.txt $data/text_temp/text.JOB|";
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log \
     compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $dir/tree $dir/0.mdl  $lang/L.fst "$tra" ark:- \| \
     fsts-union ark:- "ark:|gzip -c >$dir/fsts.JOB.gz" || exit 1;
+  rm -r $data/text_temp
 fi
 
 if [ $stage -le -1 ]; then
