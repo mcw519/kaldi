@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Copyright 2012  Johns Hopkins University (Author: Daniel Povey)
-# Apache 2.0
 # Copyright 2019  Meng Wu
+# Apache 2.0
+
+# New version support each utterance with different word segment.
 
 # Begin configuration.
 stage=-4 #  This allows restarting after partway, when something when wrong.
@@ -33,6 +35,7 @@ echo "$0 $@"  # Print the command line for logging
 if [ $# != 6 ]; then
    echo "Usage: steps/train_deltas.sh <num-leaves> <tot-gauss> <data-dir> <lang-dir> <alignment-dir> <exp-dir>"
    echo "e.g.: steps/train_deltas.sh 2000 10000 data/train_si84_half data/lang exp/mono_ali exp/tri1"
+   echo "First thing check data dir contain how much different and set up split data dir"
    echo "main options (for others, see top of script file)"
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    echo "  --config <config-file>                           # config containing options"
@@ -62,10 +65,29 @@ echo $nj > $dir/num_jobs
 utils/lang/check_phones_compatible.sh $lang/phones.txt $alidir/phones.txt || exit 1;
 cp $lang/phones.txt $dir || exit 1;
 
-sdata=$data/split${nj}_1;
-#split_data.sh $data $nj || exit 1;
-if [ -x $sdata ]; then echo "${0}: check file is OK" ; else echo "$data do not contain split${nj}_1 and split${nj}_1" dir || exit 1; fi
+sdata=$data/split${nj}_1; # carefully used split_1 to be the based split data dir.
+rm -rf $data/text # remove old text link
+num_text_file=`ls $data | grep text | wc -l`
+echo $num_text_file
+if [ $num_text_file -eq 1 ]; then
+	echo "$0: please use align_fmllr_lats.sh"
+	exit 1;
+   else
+	echo "$0: you use $num_text_file types word segment to compile training graph"
+fi
 
+echo "$0: create each segment split data dir"
+if [ -d $sdata ]; then
+   	echo "$0: already contain split data dir, skip this step"
+   else
+	for x in $(seq 1 $num_text_file); do
+   	   echo "$0: split text $x"
+   	   ln -s $PWD/$data/text_$x $data/text
+	   utils/split_data.sh $data $nj 
+	   mv $data/split$nj $data/split${nj}_$x
+	   rm $data/text
+	done
+fi
 
 [ $(cat $alidir/cmvn_opts 2>/dev/null | wc -c) -gt 1 ] && [ -z "$cmvn_opts" ] && \
   echo "$0: warning: ignoring CMVN options from source directory $alidir"
@@ -129,11 +151,12 @@ if [ $stage -le 0 ]; then
   echo "$0: compiling graphs of transcripts"
   mkdir -p $data/text_temp
   $cmd JOB=1:$nj $data/text_temp/log/merge_text.JOB.log \
-    cat $data/split${nj}_1/JOB/text $data/split${nj}_2/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
+    cat $data/split${nj}_*/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
   tra="ark:utils/sym2int.pl --map-oov $oov -f 2- $lang/words.txt $data/text_temp/text.JOB|";
   $cmd JOB=1:$nj $dir/log/compile_graphs.JOB.log \
     compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $dir/tree $dir/1.mdl  $lang/L.fst "$tra" ark:- \| \
     fsts-union ark:- "ark:|gzip -c >$dir/fsts.JOB.gz" || exit 1;
+  rm -r $data/text_temp
 fi
 
 x=1
