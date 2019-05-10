@@ -46,7 +46,7 @@ srcdir=$3
 dir=$4
 
 
-for f in $data/text $lang/oov.int $srcdir/tree $srcdir/final.mdl; do
+for f in $lang/oov.int $srcdir/tree $srcdir/final.mdl; do
   [ ! -f $f ] && echo "$0: expected file $f to exist" && exit 1;
 done
 
