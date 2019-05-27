@@ -53,8 +53,8 @@ echo $nj > $dir/num_jobs
 sdata=$data/split${nj}_1; # carefully used split_1 to be the based split data dir.
 
 rm -rf $data/text # remove old text link
-num_text_file=`ls $data | grep text | wc -l`
-echo $num_text_file
+num_text_file=`ls $data | grep "text_" | wc -l`
+#echo $num_text_file
 if [ $num_text_file -eq 1 ]; then
 	echo "$0: please use align_fmllr_lats.sh"
 	exit 1;
