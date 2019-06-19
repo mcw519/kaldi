@@ -1,0 +1,176 @@
+AA	a
+AA0	a
+AA1	a
+AA2	a
+AE	a
+AE0	a
+AE1	a
+AE2	a
+AH	a
+AH0	a
+AH1	a
+AH2	a
+AO	o u
+AO0	o u
+AO1	o u
+AO2	o u
+AW	u
+AW0	u
+AW1	u
+AW2	u
+AY	a i
+AY0	a i
+AY1	a i
+AY2	a i
+B       b
+CH	ch
+D       d
+DH      dh
+EH	a i
+EH0	a i
+EH1	a i
+EH2	a i
+ER	e
+ER0	e
+ER1     e
+ER2	e
+EY	a i
+EY0	a i
+EY1	a i
+EY2	a i
+F       f
+G       g
+HH      h
+IH	i
+IH0	i
+IH1	i
+IH2	i
+IY	i
+IY0	i
+IY1     i
+IY2     i
+JH	j yu
+K       k
+L       l
+M       m
+N       n
+NG	n
+OW	u o
+OW0	u o
+OW1	u o
+OW2	u o
+OY	u o i
+OY0	u o i
+OY1	u o i
+OY2	u o i
+P       p
+R       rh
+S       s
+SH	sh
+SIL	SIL
+SIL2	SIL2
+SPN	SPN
+T       t
+TH	th
+UH	u
+UH0	u
+UH1	u
+UH2	u
+UW	u
+UW0	u
+UW1	u
+UW2	u
+V       u
+W       u
+Y	i
+Z	z
+ZH	x
+a	a
+a0	a0
+a1	a1
+a2	a2
+a3	a3
+a4	a4
+b	b
+c	c
+ch	ch
+d	d
+e	e
+e1	e1
+e2	e2
+e3	e3
+e4	e4
+er	er
+er0	er0
+er1	er1
+er2	er2
+er3	er3
+er4	er4
+ern	ern
+ern0	ern0
+ern1	ern1
+ern2	ern2
+ern3	ern3
+ern4	ern4
+err	err
+err1	err1
+err2	err2
+err3	err3
+err4	err4
+f	f
+g	g
+h	h
+i	i
+i0	i0
+i1	i1
+i2	i2
+i3	i3
+i4	i4
+ii	ii
+ii0	ii0
+ii1	ii1
+ii2	ii2
+ii3	ii3
+ii4	ii4
+j	j
+k	k
+l	l
+m	m
+n	n
+ng	ng
+ng0	ng0
+ng1	ng1
+ng2	ng2
+ng3	ng3
+ng4	ng4
+nn	nn
+nn1	nn1
+nn2	nn2
+nn3	nn3
+nn4	nn4
+o	o
+o0	o0
+o1	o1
+o2	o2
+o3	o3
+o4	o4
+p	p
+q	q
+rh	rh
+s	s
+sh	sh
+t	t
+u	u
+u0	u0
+u1	u1
+u2	u2
+u3	u3
+u4	u4
+x	x
+yu	yu
+yu1	yu1
+yu2	yu2
+yu3	yu3
+yu4	yu4
+z	z
+zh	zh
