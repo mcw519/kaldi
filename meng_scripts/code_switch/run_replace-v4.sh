@@ -36,3 +36,4 @@ while read line; do
   fi
 
 done < $1
+sort -u new_lex.txt > lexicon.txt
