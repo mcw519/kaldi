@@ -4,12 +4,14 @@
 ## rule replace in each $line
 
 table=$2
+count=1
 
 while read line; do
+  echo $count
   word=`echo $line | cut -f 1 -d " "`
   phone=`echo $line | cut -f 2- -d " "`
 ## semi-vowel "L"
-  if [[ $phone =~ "AH0 L" ]]; then
+  if [[ $phone =~ "AH0 L " || $phone =~ "AH0 L"$ ]]; then
     ## first, check L in the end or not
     if echo $word | grep -q "L$"; then
       base_word=$word
@@ -37,7 +39,7 @@ while read line; do
 
   fi
 ## semi-vowel "N"
-  if [[ $phone =~ "AH0 N" ]]; then
+  if [[ $phone =~ "AH0 N " || $phone =~ "AH0 N"$ ]]; then
     ## first, check N in the end or not
     if echo $word | grep -q "N$"; then
       base_word=$word
@@ -65,7 +67,7 @@ while read line; do
 
   fi
 ## semi-vowel "M"
-  if [[ $phone =~ "AH0 M" ]]; then
+  if [[ $phone =~ "AH0 M " || $phone =~ "AH0 M"$ ]]; then
     ## first, check M in the end or not
     if echo $word | grep -q "M$"; then
       base_word=$word
@@ -93,6 +95,7 @@ while read line; do
 
   fi
 
-  echo $line | apply_map.pl -f 2- $table >> new_lex.txt
+  echo $line | apply_map.pl -f 2- $table >> new_lex.txt || exit 1;
+  count=$((count + 1))
 done < $1
 sort -u new_lex.txt > lexicon.txt
