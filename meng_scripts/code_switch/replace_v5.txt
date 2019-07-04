@@ -54,7 +54,7 @@ K       k
 L       l
 M       m
 N       n
-NG	n
+NG	ng
 OW	u o
 OW0	u o
 OW1	u o
