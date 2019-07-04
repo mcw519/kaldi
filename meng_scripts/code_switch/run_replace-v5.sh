@@ -4,10 +4,11 @@
 ## rule replace in each $line
 
 table=$2
-count=1
+#count=1
 
 while read line; do
-  echo $count
+#  echo $count
+  flag=1
   word=`echo $line | cut -f 1 -d " "`
   phone=`echo $line | cut -f 2- -d " "`
 ## semi-vowel "L"
@@ -15,53 +16,64 @@ while read line; do
     ## first, check L in the end or not
     if echo $word | grep -q "L$"; then
       base_word=$word
+      flag=2
       replace=`echo $phone | sed 's/AH0 L/o u/g'`
       line="$word $replace"
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
+    
+    fi
     ## second, check pronunciation rule
-    elif [[ $word =~ "AL" || $word =~ "EL" || $word =~ "IL" || $word =~ "OL" || $word =~ "UL" ]]; then
-      if [[ $word =~ $base_word ]]; then
+    if [[ $word =~ "AL" || $word =~ "EL" || $word =~ "IL" || $word =~ "OL" || $word =~ "UL" ]]; then
+      if [[ $word =~ $base_word && $flag == 1 ]]; then
         replace=`echo $phone | sed 's/AH0 L/o u/g'`
         line="$word $replace"
-
-      fi
-    ## special rule ul, ex:ULTIMATE, ULTRA
-    elif [[ $word =~ "UL" ]]; then
-      if [[ $word =~ ^UL ]]; then
-        replace=`echo $phone | sed 's/^AH0 L/a u/g'`
-        line="$word $replace"
+        word=`echo $line | cut -f 1 -d " "`
+        phone=`echo $line | cut -f 2- -d " "`
 
       fi
     else
       replace=`echo $phone | sed 's/AH0 L/o u/g'`
       line="$word $replace "
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
 
     fi
-
   fi
 ## semi-vowel "N"
   if [[ $phone =~ "AH0 N " || $phone =~ "AH0 N"$ ]]; then
     ## first, check N in the end or not
     if echo $word | grep -q "N$"; then
       base_word=$word
-      replace=`echo $phone | sed 's/AH0 N/ern/g'`
+      falg=2
+      replace=`echo $phone | sed 's/AH0 N$/ern/g'`
       line="$word $replace"
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
+
+    fi
     ## second, check pronunciation rule
-    elif [[ $word =~ "AN" || $word =~ "EN" || $word =~ "IN" || $word =~ "ON" ]]; then
-      if [[ $word =~ $base_word ]]; then
-        replace=`echo $phone | sed 's/AH0 N/ern/g'`
+    if [[ $word =~ "AN" || $word =~ "EN" || $word =~ "IN" || $word =~ "ON" || $word =~ "UN" ]]; then
+      if [[ $word =~ $base_word && $flag == 1 ]]; then
+        replace=`echo $phone | sed 's/AH0 N /ern /g'`
         line="$word $replace"
+        word=`echo $line | cut -f 1 -d " "`
+        phone=`echo $line | cut -f 2- -d " "`
 
       fi
-    ## special rule un
-    elif [[ $word =~ "UN" ]]; then
-      if [[ $word =~ ^UN ]]; then
-        replace=`echo $phone | sed 's/^AH0 N/a ng/g'`
-        line="$word $replace"
+      ## special rule. ex: UNFORTUNATELY
+      if [[ $word =~ ^UN && $phone =~ ^AH0" N" ]]; then
+         replace=`echo $phone | sed 's/^AH0 N /a ng /g'`
+         line="$word $replace"
+         word=`echo $line | cut -f 1 -d " "`
+         phone=`echo $line | cut -f 2- -d " "`
 
       fi
     else
-      replace=`echo $phone | sed 's/AH0 N/ern/g'`
+      replace=`echo $phone | sed 's/AH0 N /ern /g'`
       line="$word $replace"
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
 
     fi
 
@@ -71,31 +83,41 @@ while read line; do
     ## first, check M in the end or not
     if echo $word | grep -q "M$"; then
       base_word=$word
+      flag=2
       replace=`echo $phone | sed 's/AH0 M/ern/g'`
       line="$word $replace"
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
+
+    fi
     ## second, check pronunciation rule
-    elif [[ $word =~ "AM" || $word =~ "EM" || $word =~ "IM" || $word =~ "OM" ]]; then
+    if [[ $word =~ "AM" || $word =~ "EM" || $word =~ "IM" || $word =~ "OM" || $word =~ "UM" ]]; then
       if [[ $word =~ $base_word ]]; then
         replace=`echo $phone | sed 's/AH0 M/ern/g'`
         line="$word $replace"
+        word=`echo $line | cut -f 1 -d " "`
+        phone=`echo $line | cut -f 2- -d " "`
 
       fi
-    ## special rule um, ex:UMBRELLA
-    elif [[ $word =~ "UM" ]]; then
-      if [[ $word =~ ^UM ]]; then
+      ## special rule um, ex:UMBRELLA
+      if [[ $word =~ "UM" && $phone =~ ^AH0" M" ]]; then
         replace=`echo $phone | sed 's/^AH0 M/a ng/g'`
         line="$word $replace"
+        word=`echo $line | cut -f 1 -d " "`
+        phone=`echo $line | cut -f 2- -d " "`
 
       fi
     else
       replace=`echo $phone | sed 's/AH0 M/ern/g'`
       line="$word $replace"
+      word=`echo $line | cut -f 1 -d " "`
+      phone=`echo $line | cut -f 2- -d " "`
 
     fi
 
   fi
 
   echo $line | apply_map.pl -f 2- $table >> new_lex.txt || exit 1;
-  count=$((count + 1))
+#  count=$((count + 1))
 done < $1
 sort -u new_lex.txt > lexicon.txt
