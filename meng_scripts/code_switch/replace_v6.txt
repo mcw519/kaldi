@@ -26,10 +26,10 @@ B       b
 CH	ch
 D       d
 DH      dh
-EH	a i
-EH0	a i
-EH1	a i
-EH2	a i
+EH	e
+EH0	e
+EH1	e
+EH2	e
 ER	err
 ER0	err
 ER1     err
