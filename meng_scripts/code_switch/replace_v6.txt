@@ -7,9 +7,9 @@ AE0	a
 AE1	a
 AE2	a
 AH	a
-AH0	a
-AH1	a
-AH2	a
+AH0	er
+AH1	er
+AH2	er
 AO	o u
 AO0	o u
 AO1	o u
