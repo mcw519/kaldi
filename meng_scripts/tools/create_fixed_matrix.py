@@ -35,8 +35,8 @@ for i in a:
 		matrixM[pdf_id_2][pdf_id_2] = float(1)
 		
 # fix bias term
-matrixM[288][288] = float(0)
-matrixE[288][288] = float(0)
+#matrixM[288][288] = float(0)
+#matrixE[288][288] = float(0)
 
 arrayM = np.array(matrixM)
 arrayE = np.array(matrixE)
