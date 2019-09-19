@@ -2,7 +2,7 @@ import sys
 import io
 import re
 
-## input is opt
+## input is ops
 
 with io.open(sys.argv[1], 'r', encoding = 'utf-8') as f:
 	A = [i.strip().split() for i in f.readlines()]
