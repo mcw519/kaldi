@@ -4,7 +4,6 @@ import kaldiio
 import numpy as np
 
 ## read pdf id file format phone state pdf_1 pdf_2.
-## should set MD / EN / SIL phone id range
 
 with io.open('temp', 'r') as f:
 	a = [i.strip().split() for i in f.readlines()]
@@ -12,7 +11,7 @@ with io.open('temp', 'r') as f:
 matrixM = list()
 # total length  pdf id + 1(bias)
 for i in range(289):
-	letter = [0 for _ in range(289)]
+	letter = [0 for _ in range(289)]  # add one dim for bias
 	letter[i] = 0.5
 	matrixM.append(letter)
 
