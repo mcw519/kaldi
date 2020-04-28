@@ -174,7 +174,7 @@ def main(path):
     Input:
         a srt file
     Return:
-        two file for kaldi used
+        two files for kaldi using
             1. segments with format <new_id> <old_id> <start_time> <end_time>
             2. text
     '''
