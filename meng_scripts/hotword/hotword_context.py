@@ -23,18 +23,19 @@ def read_file_to_dict(x):
   return dict_final
 
 def check_oov_and_merge(words, words_table, list=False):
-  r"""
+  '''
     check oov and merge oov into words.txt.
     Returns:
         dict or list
-    """
+  '''
   words_table = read_file_to_dict(words_table)
   words = read_file_to_list(words)
   count = len(words_table) - 1
   for i in words:
     try:
+      # if word in word_table don't need to add new word id.
       key = ''.join(i)
-      aa = words_table[key] # if word in word_table don't need to add new word id.
+      _ = words_table[key]
     except KeyError:
       count = count + 1
       dic = {key: str(count)}
@@ -46,11 +47,11 @@ def check_oov_and_merge(words, words_table, list=False):
     return words_table
 
 def check_char_illegal(x, words_table, write=False):
-  r"""
+  '''
     read a file and check each character.
     Returns:
         legal result with list format or write in the text with ".cleanup" flac.
-    """
+  '''
   out = []
   text = read_file_to_list(x)
   words_table = read_file_to_dict(words_table)
@@ -74,7 +75,7 @@ def check_char_illegal(x, words_table, write=False):
     return out  
 
 def ChineseSegmenter(x, words_prob, character_base='false'):
-  r"""
+  '''
     This is a word segment function.
     Input:
         x : words string.
@@ -82,7 +83,7 @@ def ChineseSegmenter(x, words_prob, character_base='false'):
         character_base=True/False : Return character based segment result.
     Returns:
         list.
-  """
+  '''
   wd_prob = read_file_to_dict(words_prob)
   default_weight = float(100)
   assert len(x) > 0, 'be sure input string not empty'
@@ -163,7 +164,7 @@ def ChineseSegmenter(x, words_prob, character_base='false'):
     return (result, ['<NON>']) # avoid shape not equal.
 
 def make_context_fst(x, write=True, ):
-  r"""
+  '''
     read a Kaldi lexicon format text.
       <word1> <weight> <sub-word1> <sub-word2> <...>
       example:
@@ -173,7 +174,7 @@ def make_context_fst(x, write=True, ):
         每日一物 100 每日 一物
     Returns:
       List with FST format or write file.
-  """
+  '''
   C = read_file_to_list(x)
   C_fst = []
   state = int(0)
