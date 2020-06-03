@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2012  Johns Hopkins University (Author: Daniel Povey)
+# Copyright 2019  Author: Meng Wu
 # Apache 2.0
 
 # Computes training alignments using a model with delta or
@@ -8,7 +9,7 @@
 # If you supply the "--use-graphs true" option, it will use the training
 # graphs from the source directory (where the model is).  In this
 # case the number of jobs must match with the source directory.
-
+# New version support each utterance with different word segment.
 
 # Begin configuration section.
 nj=4
@@ -30,6 +31,7 @@ echo "$0 $@"  # Print the command line for logging
 if [ $# != 4 ]; then
    echo "usage: $0 <data-dir> <lang-dir> <src-dir> <align-dir>"
    echo "e.g.:  $0 data/train data/lang exp/tri1 exp/tri1_ali"
+   echo "First thing check data dir contain how much different and set up split data dir"
    echo "main options (for others, see top of script file)"
    echo "  --config <config-file>                           # config containing options"
    echo "  --nj <nj>                                        # number of parallel jobs"
@@ -44,7 +46,7 @@ srcdir=$3
 dir=$4
 
 
-for f in $data/text $lang/oov.int $srcdir/tree $srcdir/final.mdl; do
+for f in $lang/oov.int $srcdir/tree $srcdir/final.mdl; do
   [ ! -f $f ] && echo "$0: expected file $f to exist" && exit 1;
 done
 
@@ -52,7 +54,27 @@ oov=`cat $lang/oov.int` || exit 1;
 mkdir -p $dir/log
 echo $nj > $dir/num_jobs
 sdata=$data/split${nj}_1 # carefully used split_1 to be the based split data dir.
-if [ -x $sdata ]; then echo "${0}: check file is OK" ; else echo "$data do not contain split${nj}_1 and split${nj}_1" dir || exit 1; fi
+num_text_file=`ls $data | grep text | wc -l`
+echo $num_text_file
+if [ $num_text_file -eq 1 ]; then
+	echo "$0: please use align_fmllr_lats.sh"
+	exit 1;
+   else
+	echo "$0: you use $num_text_file types word segment to compile training graph"
+fi
+
+echo "$0: create each segment split data dir"
+if [ -d $sdata ]; then
+   	echo "$0: already contain split data dir, skip this step"
+   else
+	for x in $(seq 1 $num_text_file); do
+   	   echo "$0: split text $x"
+   	   ln -s $PWD/$data/text_$x $data/text
+	   utils/split_data.sh $data $nj 
+	   mv $data/split$nj $data/split${nj}_$x
+	   rm $data/text
+	done
+fi
 
 splice_opts=`cat $srcdir/splice_opts 2>/dev/null` # frame-splicing options.
 cp $srcdir/splice_opts $dir 2>/dev/null # frame-splicing options.
@@ -100,13 +122,14 @@ else
   echo "$0: compiling training graphs"
   mkdir -p $data/text_temp
   $cmd JOB=1:$nj $data/text_temp/log/merge_text.JOB.log \
-    cat $data/split${nj}_1/JOB/text $data/split${nj}_2/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
+    cat $data/split${nj}_*/JOB/text \| sort -u \> $data/text_temp/text.JOB || exit 1;
   tra="ark:utils/sym2int.pl --map-oov $oov -f 2- $lang/words.txt $data/text_temp/text.JOB|";
   $cmd JOB=1:$nj $dir/log/align.JOB.log \
     compile-train-graphs --read-disambig-syms=$lang/phones/disambig.int $dir/tree $dir/final.mdl  $lang/L.fst "$tra" ark:- \| \
     fsts-union ark:- ark:- \| \
     gmm-align-compiled $scale_opts --beam=$beam --retry-beam=$retry_beam --careful=$careful "$mdl" ark:- \
       "$feats" "ark,t:|gzip -c >$dir/ali.JOB.gz" || exit 1;
+  rm -r $data/text_temp
 fi
 
 steps/diagnostic/analyze_alignments.sh --cmd "$cmd" $lang $dir

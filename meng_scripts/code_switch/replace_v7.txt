@@ -1,0 +1,206 @@
+AA	a
+AA0	a0
+AA1	a1
+AA2	a2
+AA3	a3
+AA4	a4
+AE	e i
+AE0	e0 i0
+AE1	e1 i1
+AE2	e2 i2
+AE3	e3 i3
+AE4	e4 i4
+AH	er
+AH0	er0
+AH1	er1
+AH2	er2
+AH3	er3
+AH4	er4
+AO	o
+AO0	o0
+AO1	o1
+AO2	o2
+AO3	o3
+AO4	o4
+AW	a u
+AW0	a0 u0
+AW1	a1 u1
+AW2	a2 u2
+AW3	a3 u3
+AW4	a4 u4
+AY	a i
+AY0	a0 i0
+AY1	a1 i1
+AY2	a2 i2
+AY3	a3 i3
+AY4	a4 i4
+B       b
+CH	q yu0
+D       d
+DH      dh
+EH	e
+EH0	e0
+EH1	e1
+EH2	e2
+EH3	e3
+EH4	e4
+ER	err
+ER0	err0
+ER1     err1
+ER2	err2
+ER3	err3
+ER4	err4
+EY	e i
+EY0	e0 i0
+EY1	e1 i1
+EY2	e2 i2
+EY3	e3 i3
+EY4	e4 i4
+F       f
+G       g
+HH      h
+IH	i
+IH0	i0
+IH1	i1
+IH2	i2
+IH3	i3
+IH4	i4
+IY	i
+IY0	i0
+IY1     i1
+IY2     i2
+IY3	i3
+IY4	i4
+JH	j yu0
+K       k
+L       l
+M       m
+N       n
+NG	ng
+OW	o u
+OW0	o0 u0
+OW1	o1 u1
+OW2	o2 u2
+OW3	o3 u3
+OW4	o4 u4
+OY	o i
+OY0	o0 i0
+OY1	o1 i1
+OY2	o2 i2
+OY3	o3 i3
+OY4	o4 i4
+P       p
+R       rh
+S       s
+SH	x yu0
+SIL	SIL
+SIL2	SIL2
+SPN	SPN
+T       t
+TH	th
+UH	u
+UH0	u0
+UH1	u1
+UH2	u2
+UH3	u3
+UH4	u4
+UW	u
+UW0	u0
+UW1	u1
+UW2	u2
+UW3	u3
+UW4	u4
+V       v
+W       u
+Y	i
+Z	z
+ZH	zh
+a	a
+a0	a0
+a1	a1
+a2	a2
+a3	a3
+a4	a4
+b	b
+c	c
+ch	ch
+d	d
+e	e
+e1	e1
+e2	e2
+e3	e3
+e4	e4
+er	er
+er0	er0
+er1	er1
+er2	er2
+er3	er3
+er4	er4
+ern	ern
+ern0	ern0
+ern1	ern1
+ern2	ern2
+ern3	ern3
+ern4	ern4
+err	err
+err1	err1
+err2	err2
+err3	err3
+err4	err4
+f	f
+g	g
+h	h
+i	i
+i0	i0
+i1	i1
+i2	i2
+i3	i3
+i4	i4
+ii	ii
+ii0	ii0
+ii1	ii1
+ii2	ii2
+ii3	ii3
+ii4	ii4
+j	j
+k	k
+l	l
+m	m
+n	n
+ng	ng
+ng0	ng0
+ng1	ng1
+ng2	ng2
+ng3	ng3
+ng4	ng4
+nn	nn
+nn1	nn1
+nn2	nn2
+nn3	nn3
+nn4	nn4
+o	o
+o0	o0
+o1	o1
+o2	o2
+o3	o3
+o4	o4
+p	p
+q	q
+rh	rh
+s	s
+sh	sh
+t	t
+u	u
+u0	u0
+u1	u1
+u2	u2
+u3	u3
+u4	u4
+x	x
+yu	yu
+yu1	yu1
+yu2	yu2
+yu3	yu3
+yu4	yu4
+z	z
+zh	zh
