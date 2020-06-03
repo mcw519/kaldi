@@ -1,0 +1,3 @@
+python3 autoencoder/train.py --dir=exp/king-asr-079/autoencoder --feats-scp=data/king-asr-079/feats.scp --device-id=1 --is-training=True --batch-size=8 --input-dim=40 --output-dim=40 --train.target-scp=data/king-asr-079/feats.scp --train.lr=0.0001 --train.l2-regularize=0.00001 --train.num-epochs=20
+
+python3 autoencoder/inference.py --dir=exp/toy_data/autoencode/inference/test/ --feats-scp=autoencoder/toy_data/normalize.scp --device-id=1 --is-training=False --batch-size=1 --input-dim=40 --output-dim=40 --checkpoint=exp/toy_data/autoencode/best_model.pt
