@@ -15,7 +15,7 @@ from tdnnf_layer import FactorizedTDNN
 from tdnnf_layer import OrthonormalLinear
 from tdnnf_layer import PrefinalLayer
 from tdnnf_layer import TDNN
-from entropy_layer_final import LanguageEntropyControl, pdf_select
+from entropy_layer_final import pdf_select
 
 def get_chain_model(feat_dim,
                     output_dim,
@@ -62,11 +62,32 @@ tdnnf-layer name=tdnnf12 l2-regularize=0.008 dropout-proportion=0.0 bypass-scale
 tdnnf-layer name=tdnnf13 l2-regularize=0.008 dropout-proportion=0.0 bypass-scale=0.66 dim=1024 bottleneck-dim=128 time-stride=3
 linear-component name=prefinal-l dim=256 l2-regularize=0.008 orthonormal-constraint=-1.0
 
-prefinal-layer name=prefinal-chain input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
-output-layer name=output include-log-softmax=false dim=3456 l2-regularize=0.002
+prefinal-layer name=prefinal-0-chain input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
+output-layer name=output-0 include-log-softmax=false dim=3456 l2-regularize=0.002
+prefinal-layer name=prefinal-1-chain input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
+output-layer name=output-1 include-log-softmax=false dim=3456 l2-regularize=0.002
 
-prefinal-layer name=prefinal-xent input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
-output-layer name=output-xent dim=3456 learning-rate-factor=5.0 l2-regularize=0.002
+prefinal-layer name=prefinal-0-xent input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
+output-layer name=output-0-xent dim=3456 learning-rate-factor=5.0 l2-regularize=0.002
+prefinal-layer name=prefinal-1-xent input=prefinal-l l2-regularize=0.008 big-dim=1024 small-dim=256
+output-layer name=output-1-xent dim=3456 learning-rate-factor=5.0 l2-regularize=0.002
+
+component name=md-chain type=FixedAffineComponent matrix=code-mix-file/M.mat
+component-node name=md-chain component=md-chain input=output-0.affine
+output-node name=output-0 input=md-chain objective=linear
+component name=md-xent type=FixedAffineComponent matrix=code-mix-file/M.mat
+component-node name=md-xent component=md-xent input=output-0-xent.log-softmax
+output-node name=output-0-xent input=md-xent objective=linear
+
+component name=en-chain type=FixedAffineComponent matrix=code-mix-file/E.mat
+component-node name=en-chain component=en-chain input=output-1.affine
+output-node name=output-1 input=en-chain objective=linear
+component name=en-xent type=FixedAffineComponent matrix=code-mix-file/E.mat
+component-node name=en-xent component=en-xent input=output-1-xent.log-softmax
+output-node name=output-1-xent input=en-xent objective=linear
+
+output-node name=output input=Sum(md-chain, en-chain) objective=linear
+output-node name=output-xent input=Sum(md-xent, en-xent) objective=linear
 '''
 
 
@@ -139,9 +160,6 @@ class ChainModel(nn.Module):
         self.output_1_affine = nn.Linear(in_features=prefinal_bottleneck_dim,
                                        out_features=output_dim)
 
-#        # Language entropy control requires [N, T, C]
-#        self.entropy_1_layer = LanguageEntropyControl(normalize=True, cost='alex')
-
         # prefinal_xent requires [N, C, T]
         self.prefinal_1_xent = PrefinalLayer(big_dim=hidden_dim,
                                            small_dim=prefinal_bottleneck_dim)
@@ -156,9 +174,6 @@ class ChainModel(nn.Module):
         # output_affine requires [N, T, C]
         self.output_2_affine = nn.Linear(in_features=prefinal_bottleneck_dim,
                                        out_features=output_dim)
-
-#        # Language entropy control requires [N, T, C]
-#        self.entropy_2_layer = LanguageEntropyControl(normalize=True, cost='alex')
 
         # prefinal_xent requires [N, C, T]
         self.prefinal_2_xent = PrefinalLayer(big_dim=hidden_dim,
@@ -226,10 +241,6 @@ class ChainModel(nn.Module):
             # at this point, nnet_output is [N, T, C]
             nnet_output_1 = self.output_1_affine(nnet_output_1)
 
-            ###################
-            #nnet_output_1 = self.entropy_1_layer(nnet_output_1)
-            ###################
-
             # for the xent node
             xent_output_1 = self.prefinal_1_xent(x)
 
@@ -263,10 +274,6 @@ class ChainModel(nn.Module):
             # at this point, nnet_output is [N, T, C]
             nnet_output_2 = self.output_2_affine(nnet_output_2)
 
-            ###################
-            #nnet_output_2 = self.entropy_2_layer(nnet_output_2)
-            ###################
-
             # for the xent node
             xent_output_2 = self.prefinal_2_xent(x)
 
@@ -298,9 +305,6 @@ class ChainModel(nn.Module):
                 nnet_output_1 = self.prefinal_1_chain(x)
                 nnet_output_1 = nnet_output_1.permute(0, 2, 1)
                 nnet_output_1 = self.output_1_affine(nnet_output_1)
-                ###################
-                #nnet_output_1 = self.entropy_1_layer(nnet_output_1)
-                ###################
                 xent_output_1 = self.prefinal_1_xent(x)
                 xent_output_1 = xent_output_1.permute(0, 2, 1)
                 xent_output_1 = self.output_1_xent_affine(xent_output_1)
@@ -309,9 +313,6 @@ class ChainModel(nn.Module):
                 nnet_output_2 = self.prefinal_2_chain(x)
                 nnet_output_2 = nnet_output_2.permute(0, 2, 1)
                 nnet_output_2 = self.output_2_affine(nnet_output_2)
-                ###################
-                #nnet_output_2 = self.entropy_2_layer(nnet_output_2)
-                ###################
                 xent_output_2 = self.prefinal_2_xent(x)
                 xent_output_2 = xent_output_2.permute(0, 2, 1)
                 xent_output_2 = self.output_2_xent_affine(xent_output_2)
