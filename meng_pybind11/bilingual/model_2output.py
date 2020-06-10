@@ -15,7 +15,7 @@ from tdnnf_layer import FactorizedTDNN
 from tdnnf_layer import OrthonormalLinear
 from tdnnf_layer import PrefinalLayer
 from tdnnf_layer import TDNN
-from entropy_layer_final import pdf_select
+from trick_layer import pdf_select, EntropyFunction
 
 def get_chain_model(feat_dim,
                     output_dim,
@@ -195,7 +195,7 @@ class ChainModel(nn.Module):
 
         self.register_forward_pre_hook(constrain_orthonormal_hook)
 
-    def forward(self, x, dropout=0. , lang=None):
+    def forward(self, x, dropout=0. , lang=None, entropy=None):
         # input x is of shape: [batch_size, seq_len, feat_dim] = [N, T, C]
         assert x.ndim == 3
 
@@ -320,6 +320,10 @@ class ChainModel(nn.Module):
 
                 nnet_output = pdf_select(nnet_output_1, nnet_output_2)
                 xent_output = pdf_select(xent_output_1, xent_output_2)
+
+                if entropy:
+                    nnet_output = EntropyFunction.apply(nnet_output)
+                    xent_output = EntropyFunction.apply(xent_output)
 
                 return nnet_output, xent_output
 

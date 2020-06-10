@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright 2019 Mobvoi AI Lab, Beijing, China (author: Fangjun Kuang)
+# Copyright 2020 Author: Meng Wu
 # Apache 2.0
 
 import os
@@ -16,7 +17,7 @@ import kaldi_pybind.nnet3 as nnet3
 import kaldi
 
 from common import splice_feats
-from model import get_chain_model
+from model_2output import get_chain_model
 
 
 def get_feat_dataloader(feats_scp,

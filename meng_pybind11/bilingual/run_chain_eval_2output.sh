@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Copyright 2020 Author: Meng Wu
+
 nj=1
 device_id=0
 # You should know how to calculate your model's left/right context **manually**
@@ -24,7 +26,8 @@ save_nn_output_as_compressed=false
 feat_type="delta"
 online_cmvn=true
 lang="default"
-
+entropy="false" # true, false to use EntropyFunction
+affix= # if using EntropyFunction store result in other dir name, avoid confuse original dir.
 
 . utils/parse_options.sh
 . cmd.sh
@@ -40,14 +43,14 @@ evaldir=$2
 chaindir=$3
 evalname=`basename $evaldir`
 ivector_scp=$evaldir/ivector/ivector_online.scp
-
+if [ $entropy != "false" ]; then  affix='_entropy' ;fi
 
 Inference=1
 Decode=1
 
 if [ $Inference -eq 1 ]; then
   echo "$0: inference: computing likelihood"
-  mkdir -p $chaindir/inference/$evalname
+  mkdir -p $chaindir/inference${affix}/$evalname
   best_epoch=$(cat $chaindir/train/best-epoch-info | grep 'best epoch' | awk '{print $NF}')
   inference_checkpoint=$chaindir/train/epoch-${best_epoch}.pt
   feat_dim=43 #$(cat $chaindir/egs/info/feat_dim)
@@ -63,11 +66,11 @@ if [ $Inference -eq 1 ]; then
   fi
 
 
-  run.pl --gpu 1 $chaindir/inference/logs/$evalname.log \
-    python3 ./chain_bilingual/inference_2output.py \
+  run.pl --gpu 1 $chaindir/inference${affix}/logs/$evalname.log \
+    python3 ./bilingual/inference_2output.py \
       --bottleneck-dim $bottleneck_dim \
       --checkpoint $inference_checkpoint \
-      --dir $chaindir/inference/$evalname \
+      --dir $chaindir/inference${affix}/$evalname \
       --feat-dim $feat_dim \
       --feats-scp $feat_scp \
       --ivector-dim $ivector_dim \
@@ -82,6 +85,7 @@ if [ $Inference -eq 1 ]; then
       --output-dim $output_dim \
       --prefinal-bottleneck-dim $prefinal_bottleneck_dim \
       --save-as-compressed $save_nn_output_as_compressed \
+      --entropy $entropy \
       --subsampling-factor-list "$subsampling_factor_list" || exit 1
 fi
 
@@ -91,7 +95,7 @@ if [ $Decode -eq 1 ]; then
     --nj $nj \
     $graphdir \
     $chaindir/init/${lang}_trans.mdl \
-    $chaindir/inference/$evalname/nnet_output.scp \
-    $chaindir/decode_res/$evalname
+    $chaindir/inference${affix}/$evalname/nnet_output.scp \
+    $chaindir/decode_res${affix}/$evalname
 fi
 

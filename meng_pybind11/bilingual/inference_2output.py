@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright 2019 Mobvoi AI Lab, Beijing, China (author: Fangjun Kuang)
+# Copyright 2020 Author: Meng Wu
 # Apache 2.0
 
 import logging
@@ -83,7 +84,7 @@ def main():
         key_list, padded_feat, output_len_list = batch
         padded_feat = padded_feat.to(device)
         with torch.no_grad():
-            nnet_output, _ = model(padded_feat, lang=None)
+            nnet_output, _ = model(padded_feat, lang=None, entropy=args.entropy_control)
         
         num = len(key_list)
         first = 0

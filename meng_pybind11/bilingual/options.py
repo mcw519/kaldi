@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright 2019 Mobvoi AI Lab, Beijing, China (author: Fangjun Kuang)
+# Copyright 2020 Author: Meng Wu
 # Apache 2.0
 
 import argparse
@@ -63,6 +64,12 @@ def _set_inference_args(parser):
         help='true to save the neural network output to CompressedMatrix,'
         ' false to Matrix<float>',
         type=_str2bool)
+
+    parser.add_argument('--entropy',
+                        dest='entropy_control',
+                        help='do entropy control',
+                        type=_str2bool,
+                        )
 
 
 def _set_training_args(parser):

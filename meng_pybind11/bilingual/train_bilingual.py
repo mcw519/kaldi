@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 # Copyright 2019-2020 Mobvoi AI Lab, Beijing, China (author: Fangjun Kuang)
-#           2020 Meng Wu
+# Copyright 2020 Author: Meng Wu
+
 # Apache 2.0
 
 import logging

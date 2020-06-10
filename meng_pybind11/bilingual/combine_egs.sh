@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Copyright 2020 Srikanth Madikeri (Idiap Research Institute)
+# Copyright 2020 Author: Meng Wu
 # Apache 2.0
 #
 # This script combines egs folder generated with chain2 recipes to prepare a single egs folder
