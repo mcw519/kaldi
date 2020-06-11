@@ -1,3 +1,7 @@
+#! /usr/bin/enve/ python3
+
+# Copyright 2020 (author: Meng Wu)
+
 import os
 import io
 import math

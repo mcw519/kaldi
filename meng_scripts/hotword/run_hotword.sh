@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Copyright 2020 (author: Meng Wu)
 
 . parse_options.sh || exit 1;
 

@@ -1,3 +1,7 @@
+#! /usr/bin/enve/ python3
+
+# Copyright 2020 (author: Meng Wu)
+
 import os
 import io
 import argparse
@@ -14,7 +18,7 @@ def main(args):
   hot_wd_table = []
   f = io.open(args.hotwords, 'r')
   c_out = io.open(args.output_dir + '/C.txt', 'a+', encoding='utf-8')
-  
+
   for i in f.readlines():
     # check hotword table inculde oov/illegal char or not.
     # if contain illegial char, remove the line.

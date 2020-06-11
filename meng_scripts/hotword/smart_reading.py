@@ -1,3 +1,7 @@
+#! /usr/bin/enve/ python3
+
+# Copyright 2020 (author: Meng Wu)
+
 import sys
 import io
 import re
@@ -46,7 +50,7 @@ def smart_read(x, wd_table):
             English word, "LEONA"
         type 3:
             Customize word pair, first column sould be your customize word and the others are how to spell.
-            "TAYLOR-SWIFT TAYLOR SWIFT", "LMFAO L M F A O", "3D 3 D"
+            "TAYLOR-SWIFT TAYLOR SWIFT", "LMFAO L M F A O"
     Return:
         (int, string/list)
     '''
