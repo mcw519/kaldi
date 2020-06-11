@@ -32,7 +32,7 @@ new_wd_table=$outputdir/words.txt
 C=$outputdir/C.txt.fst
 Cfst=$outputdir/C.fst
 
-python hotword_context.py $hotword $wd_table $unigram $weight $outputdir
+python3 hotword_context.py $hotword $wd_table $unigram $weight $outputdir
 
 fstcompile --isymbols=$new_wd_table --osymbols=$new_wd_table $C | fstarcsort --sort_type=ilabel > $Cfst
 fstcompose $HCLG $Cfst $outputdir/HCLG.fst
