@@ -7,6 +7,14 @@ if [ $# != 5 ]; then
   cat >&2 <<EOF
 Usage: $0 [options] <words.txt> <output dir> <hotword table> <unigram> <old HCLG.fst>
 Note:
+  Format(x): <type id> <content>
+    type 1:
+      Chinese word, "每日一物", "吳孟哲"
+    type 2:
+      English word, "LEONA"
+    type 3:
+      Customize word pair, first column sould be your customize word and the others are how to spell.
+      "TAYLOR-SWIFT TAYLOR SWIFT", "LMFAO L M F A O"
 Options:
 EOF
    exit 1;
