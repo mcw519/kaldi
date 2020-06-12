@@ -1,3 +1,5 @@
+# Copyright 2020  Meng Wu
+
 import sys
 import io
 from hotword_context import ChineseSegmenter

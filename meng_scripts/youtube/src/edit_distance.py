@@ -1,3 +1,5 @@
+# Copyright 2020  Meng Wu
+
 def edit_distance(x1, x2):
     '''
     Input:

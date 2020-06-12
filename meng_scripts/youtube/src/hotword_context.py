@@ -1,3 +1,5 @@
+# Copyright 2020  Meng Wu
+
 import os
 import io
 import argparse

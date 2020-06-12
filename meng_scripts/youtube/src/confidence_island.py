@@ -1,3 +1,5 @@
+# Copyright 2020  Meng Wu
+
 import sys
 import io
 import os
@@ -66,7 +68,6 @@ def confidence_island(hyp, ref, island=5, position=True):
                 pos.append([flag , i - bias + 1])
         else:
             temp_wd.append(trans[i])
-    #print(seg, pos)
     final = []
 
     if position:
@@ -77,10 +78,6 @@ def confidence_island(hyp, ref, island=5, position=True):
             if position:
                 final_pos.append([pos[i]])
     if position:
-        # for testing
-        #for i in final_pos:
-        #    n, m = i
-        #    print(hyp[n:m])
         return final, final_pos
     else:
         return final
@@ -95,18 +92,15 @@ def generate_new_segment(s_dict, d_dict, uttid, boundary):
     '''
     start_dict = s_dict
     dur_dict = d_dict
-    #print(boundary)
     if len(boundary) > 1:
         # one line include more than 1 segment: uttid_segxxx
         j = 0
         for i in boundary:
             ss, ee = i
             new_uttid = uttid + str('_seg') + str(j).zfill(3)
-            start = start_dict[uttid][ss:ee][0][0] #start_dict[uttid][i][0]
-            end = float(start_dict[uttid][ss:ee][-1][0]) + float(dur_dict[uttid][ss:ee][-1][0]) #float(start_dict[uttid][i][-1]) + float(dur_dict[uttid][i][-1])
+            start = start_dict[uttid][ss:ee][0][0]
+            end = float(start_dict[uttid][ss:ee][-1][0]) + float(dur_dict[uttid][ss:ee][-1][0])
             j += 1
-            #print(start_dict, dur_dict)
-            #print(start_dict[uttid][i][-1])
             return new_uttid, uttid, str(start), str(end)
     else:
         ss, ee = boundary[0]
@@ -198,13 +192,11 @@ def main(ref, hyp, ctm):
                 for seg in result:
                     new_id = ref[i][0] + '_seg' + str(c).zfill(3)
                     _, temp2, temp3, temp4 = generate_new_segment(s_dict, d_dict, ref[i][0], boundary[c])
-                    #print(new_id, ' '.join(seg[:-1]))
                     island.write(new_id + ' ' + ' '.join(seg[:-1]) + '\n')
                     segments.write(new_id + ' ' + str(temp2) + ' ' +  str(temp3) + ' ' + str(temp4) + '\n')
                     c += 1
             else:
                 _, temp2, temp3, temp4 = generate_new_segment(s_dict, d_dict, ref[i][0], boundary[0])
-                #print(ref[i][0], ' '.join(result[0][:-1]))
                 island.write(ref[i][0] + ' ' + ' '.join(result[0][:-1]) + '\n')
                 segments.write(ref[i][0] + ' ' + str(temp2) + ' ' +  str(temp3) + ' ' + str(temp4) + '\n')
 
@@ -216,11 +208,9 @@ def main(ref, hyp, ctm):
                 c = 0
                 for seg in result:
                     new_id = ref[i][0] + '_seg' + str(c).zfill(3)
-                    #print(new_id, ' '.join(seg[0][:-1]))
                     island.write(new_id + ' ' + ' '.join(seg[:-1]) + '\n')
                     c += 1
             else:
-                #print(ref[i][0], ' '.join(result[0][:-1]))
                 island.write(ref[i][0] + ' ' + ' '.join(result[0][:-1]) + '\n')
 
 

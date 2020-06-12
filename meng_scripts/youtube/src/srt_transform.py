@@ -1,3 +1,5 @@
+# Copyright 2020  Meng Wu
+
 import io
 import os
 import sys
