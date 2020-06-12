@@ -2,6 +2,8 @@
 
 # Copyright 2020 (author: Meng Wu)
 
+weight=0.9 # weight for each hotword
+
 . parse_options.sh || exit 1;
 
 if [ $# != 5 ]; then
@@ -17,6 +19,7 @@ Note:
       Customize word pair, first column sould be your customize word and the others are how to spell.
       "TAYLOR-SWIFT TAYLOR SWIFT", "LMFAO L M F A O"
 Options:
+  --weight <weight> # weight for each hotword, default=0.9
 EOF
    exit 1;
 fi
@@ -27,7 +30,6 @@ hotword=$3
 unigram=$4
 HCLG=$5
 
-weight=0.9
 new_wd_table=$outputdir/words.txt
 C=$outputdir/C.txt.fst
 Cfst=$outputdir/C.fst
