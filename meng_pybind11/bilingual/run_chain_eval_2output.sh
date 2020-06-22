@@ -2,6 +2,8 @@
 
 # Copyright 2020 Author: Meng Wu
 
+eval_script="inference_2output.py" # others inference_2output_lid_discriminator.py
+
 nj=1
 device_id=0
 # You should know how to calculate your model's left/right context **manually**
@@ -67,7 +69,7 @@ if [ $Inference -eq 1 ]; then
 
 
   run.pl --gpu 1 $chaindir/inference${affix}/logs/$evalname.log \
-    python3 ./bilingual/inference_2output.py \
+    python3 ./bilingual/$eval_script \
       --bottleneck-dim $bottleneck_dim \
       --checkpoint $inference_checkpoint \
       --dir $chaindir/inference${affix}/$evalname \

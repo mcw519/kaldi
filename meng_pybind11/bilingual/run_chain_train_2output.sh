@@ -6,6 +6,8 @@
 
 set -e
 
+train_script="train_bilingual.py" # others "train_bilingual_lid_discriminator.py"
+
 nj=10
 
 train_1_data_dir=/nfs/TPAICSASR03/meng/multi_lang/data/mandarin-train
@@ -233,7 +235,7 @@ if [ $Training -eq 1 ]; then
     cuda_train_cmd="$cuda_train_cmd --gpu $world_size $chain_dir/$train_dir/logs/train.log"
   fi
   
-  $cuda_train_cmd python3 ./chain_bilingual/train_bilingual.py \
+  $cuda_train_cmd python3 ./chain_bilingual/$train_script \
         --bottleneck-dim $bottleneck_dim \
         --checkpoint=${train_checkpoint:-} \
         --dir $chain_dir/$train_dir \
