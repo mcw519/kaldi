@@ -119,14 +119,6 @@ def get_objf(batch, model, device, criterion, opts, den_graph, training, optimiz
                 p.requires_grad = False
             elif name.startswith('output_1'):
                 p.requires_grad = False
-            elif name.startswith('prefinal_2'):
-                p.requires_grad = False
-            elif name.startswith('output_2'):
-                p.requires_grad = False
-            elif name.startswith('prefinal_1'):
-                p.requires_grad = False
-            elif name.startswith('output_1'):
-                p.requires_grad = False
             elif name.startswith('predict_id'):
                 p.requires_grad = True
 

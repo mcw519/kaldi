@@ -9,7 +9,6 @@ from torch.utils.dlpack import to_dlpack
 
 import kaldi
 from kaldi import chain
-from entropy_layer2 import language_entropy
 
 g_nnet_output_deriv_tensor = None
 g_xent_output_deriv_tensor = None
