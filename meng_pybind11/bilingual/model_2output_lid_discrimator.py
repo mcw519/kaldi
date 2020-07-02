@@ -15,7 +15,7 @@ from tdnnf_layer import FactorizedTDNN
 from tdnnf_layer import OrthonormalLinear
 from tdnnf_layer import PrefinalLayer
 from tdnnf_layer import TDNN
-from entropy_layer_final import pdf_select
+from trick_layer import pdf_select
 from discriminator import LIDDiscriminator, lid_decode
 
 def get_chain_model(feat_dim,
