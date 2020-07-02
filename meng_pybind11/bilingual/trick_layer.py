@@ -103,11 +103,14 @@ def lang_select(x, lang):
 
 
 def compute_entropy(x):
+    '''
+    x should be probability with shape [N, T, C].
+    '''
     N, T, _ = x.shape
     _plogp = x * torch.log(x) # compute Plog(P)
     _plogp[ _plogp != _plogp ] = 0 # convert nan to 0
     # now _plog is [N, T, C]
-    _entropy = (-1) * _plogp.view(N, T, -1).sum(2) # [N,T] for each point in T means each frames En entropy
+    _entropy = (-1) * _plogp.view(N, T, -1).sum(2) # [N,T] for each point in T means each frame's entropy
     _entropy = _entropy.view(N, T, 1) # [N, T, 1]
 
     return _entropy
