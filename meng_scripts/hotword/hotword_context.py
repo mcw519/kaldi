@@ -7,7 +7,7 @@ import io
 import argparse
 import math
 from smart_reading import smart_read
-from common import check_oov_and_merge, read_file_to_dict, read_file_to_list, ChineseSegmenter, make_context_fst
+from common import check_oov_and_merge, read_file_to_dict, read_file_to_list, ChineseSegmenter2, make_context_fst
 
 non_hotwords_weight = 0.1
 
@@ -36,9 +36,9 @@ def main(args):
     wd_table = check_oov_and_merge(hot_wd, wd_table)
     
     if _type == 1:
-      for j in ChineseSegmenter(hot_wd, args.unigram, character_base=True):
-        if j != ['<NON>']:
-          c_out.write(hot_wd + '\t' + str(args.weight) + '\t' + ' '.join(j) + '\n')
+      tokenizor = ChineseSegmenter2(args.unigram)
+      result = list(tokenizor.segment(hot_wd))
+      c_out.write(hot_wd + '\t' + str(args.weight) + '\t' + ' '.join(result) + '\n')
 
     elif _type == 2:
       c_out.write(hot_wd + '\t' + str(args.weight) + '\t' + hot_wd + '\n')

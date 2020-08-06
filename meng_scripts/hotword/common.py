@@ -5,6 +5,7 @@
 import os
 import io
 import math
+import re
 
 
 def read_file_to_list(x):
@@ -61,7 +62,7 @@ def ChineseSegmenter(x, words_prob, character_base='false'):
   best_prob = [float(0)] # inital 
   prev = []
   current_weight = float(0)
-
+  
   for i in range(text_len):
     for j in range(i+1, text_len+1):
       # exceeds the max length
@@ -134,6 +135,78 @@ def ChineseSegmenter(x, words_prob, character_base='false'):
     return (result, ['<NON>']) # avoid shape not equal.
 
 
+class ChineseSegmentor2():
+  '''
+      as same as Jieba's algorithm
+  '''
+  def __init__(self, lex):
+    self.lex = lex
+    
+
+  def DAG(self, x):
+    '''
+      台灣大學生
+      DAG = {0:[0, 1, 2], 1:[1], 2:[2, 3, 4], 3:[3, 4], 4:[4]}
+    '''
+    x = str(x)
+    _len = len(x)
+    _dag = {}
+    for i in range(_len):
+      for j in range(i, _len):
+        if i == j:
+          try:
+            _ = self.lex[x[i]]
+            try:
+              _dag[i].append(j)
+            except KeyError:
+                _dag[i] = [j]
+          except KeyError:
+            continue
+
+        else:
+          try:
+            _ = self.lex[x[i:j+1]]
+            try:
+              _dag[i].append(int(j))
+            except KeyError:
+              _dag[i] = [int(j)]
+          except KeyError:
+            continue
+        
+    return _dag
+
+  def segment(self, x):
+    _route = {}
+    _dag = self.DAG(x)
+    _len = len(x)
+    _route[_len] = (0, 0)
+    _logtotal = math.log(0.5)
+    for idx in range(_len - 1, -1, -1):
+      temp = []
+      for idy in _dag[idx]:
+        temp.append((math.log(self.lex[x[idx:idy + 1]] - _logtotal + _route[idy + 1][0]), idy))
+        _route[idx] = max(temp)
+        
+    i = 0
+    buf = ''
+    re_eng = re.compile('[a-zA-Z0-9]', re.U)
+    while i < _len:
+      j = _route[i][1] + 1
+      l_word = x[i:j]
+      if re_eng.match(l_word) and len(l_word) == 1:
+        buf += l_word
+        i = j
+      else:
+        if buf:
+          yield buf
+          buf = ''
+        yield l_word
+        i = j
+      if buf:
+        yield buf
+        buf = ''
+
+
 def make_context_fst(x, write=True):
   '''
     read a Kaldi lexicon format text.
@@ -172,3 +245,14 @@ def make_context_fst(x, write=True):
         f.write('\t'.join(C_fst[i]) + '\n')
   else:
       return(C_fst)
+
+
+def test():
+    lex = {'台灣':0.1 , '大':0.3 , '學生': 0.3 , '大學生': 0.4, '台': 0.05, '灣': 0.05, '學': 0.1, '生':0.1, '台灣大': 0.08, '大學': 0.2}
+    a = ChineseSegmentor2(lex)
+    print(a.DAG('台灣大學生'))
+    print(' '.join(a.segment('台灣大學生')))
+
+
+if __name__ == '__main__':
+    test()
